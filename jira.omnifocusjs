@@ -3,7 +3,7 @@
   "targets": ["omnifocus"],
   "author": "Bastian Kuhn",
   "identifier": "de.bastian-kuhn.omnifocus.sync.jira",
-  "version": "1.3",
+  "version": "1.4",
   "description": "Sync elements from Jira with Omnifocus",
   "label": "🔹 Jira: Sync",
   "shortLabel": "Jira: sync"
@@ -12,8 +12,7 @@
   const action = new PlugIn.Action(function (selection, sender) {
     // START EDIT
     const configs = [{
-        user: "", // use email address for jira cloud
-        password: "", // you can use api tokens, see https://id.atlassian.com/manage-profile/security/api-tokens
+        token: "", // use a personal access token
         jiraUrl: "",
         omnifocusTagToUse: "Jira", // you can also use the format "Parent1 : Parent2 : Child"
         jiraQuery: "assignee=currentuser() and resolution is empty",
@@ -21,8 +20,7 @@
         omnifocusCommentTagToUse: "Jira-Comment",
 //    },
 //    {
-//        user: "",
-//        password: "",
+//        token: "",
 //        jiraUrl: "",
 //        omnifocusTagToUse: "",
 //        jiraQuery: "assignee=currentuser() and resolution is empty",
@@ -33,8 +31,7 @@
     // END EDIT
 
     configs.forEach((config) => {
-        const user = config.user;
-        const password = config.password;
+        const token = config.token;
         const jiraUrl = config.jiraUrl;
         const omnifocusTagToUse = config.omnifocusTagToUse;
         const jiraQuery = config.jiraQuery;
@@ -44,15 +41,10 @@
         const urlParams = "/rest/api/2/search?jql=" + encodeURIComponent(jiraQuery);
         const url = jiraUrl + urlParams;
 
-
-        const data = Data.fromString(user + ":" + password);
-        const credentials = data.toBase64();
-
         const request = URL.FetchRequest.fromString(url);
         request.method = "GET";
-        request.headers = { Authorization: `Basic ${credentials}` };
+        request.headers = { Authorization: `Bearer ${token}` };
         const requestPromise = request.fetch();
-
 
         // Find the tag
         let tag = null;
