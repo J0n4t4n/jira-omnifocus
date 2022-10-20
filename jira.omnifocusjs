@@ -176,14 +176,14 @@
               // Search if we need to add a new Task
               checkedTickets++;
               if (omnifocusTasks[issue.key]) {
-                // Make sure the task opens again
+                // Make sure the task opens again (does nothing when task is Dropped)
                 omnifocusTasks[issue.key].markIncomplete();
                 omnifocusTasks[issue.key].jiraToOmnifocusMatched = true;
                 continue;
               }
 
               // There was no Matching Task, so we create the Task
-              const taskName = issue.key + " " + issue.fields.summary;
+              const taskName = issue.key + ": " + issue.fields.summary;
               const newTask = new Task(taskName, inbox.beginning);
               const taskUrl = jiraUrl + "/browse/" + issue.key;
               createdTasks++;
@@ -216,7 +216,7 @@
                     const commentUrl = jiraUrl + commentUrlParams;
                     const commentRequest = URL.FetchRequest.fromString(commentUrl);
                     commentRequest.method = "GET";
-                    commentRequest.headers = { Authorization: `Basic ${credentials}` };
+                    commentRequest.headers = { Authorization: `Bearer ${token}` };
                     var requestPromiseComment = commentRequest.fetch();
                     requestPromiseComment.then((commentResponse) => {
                         const jsonComments = JSON.parse(commentResponse.bodyString);
