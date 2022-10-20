@@ -233,7 +233,9 @@
                 }
             };
           }
-          console.log(`NOTICE: Synced ${jiraUrl}. Checked ${checkedTickets} Tickets, Created ${createdTasks} new tasks, Added ${createdComments} Subtickets for Comments`);
+          const fmtr = Formatter.Date.iso8601
+          const curTime = fmtr.stringFromDate(new Date())
+          console.log(`${curTime} NOTICE: Synced ${jiraUrl}. Checked ${checkedTickets} Tickets, Created ${createdTasks} new tasks, Added ${createdComments} Subtickets for Comments`);
         });
 
         requestPromise.catch((err) => {
