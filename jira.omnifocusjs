@@ -9,19 +9,57 @@
   "shortLabel": "Jira: sync"
 }*/
 (() => {
-  const action = new PlugIn.Action(function (selection, sender) {
+  const serviceTitle = "omnifocus-jira-sync"
+  let credentials = new Credentials()
+
+  const requestCredentials = () => {
+    let inputForm = new Form()
+
+    let tokenField = new Form.Field.Password(
+      "personalAccessToken",
+      "Personal Access Token",
+      null
+    )
+
+    let endpointField = new Form.Field.String(
+      "endpoint",
+      "Jira Endpoint",
+      null
+    )
+
+    inputForm.addField(tokenField)
+    inputForm.addField(endpointField)
+
+    let formPrompt = "Enter personal access token:"
+    let formPromise = inputForm.show(formPrompt, "Continue")
+
+    inputForm.validate = formObject => {
+      let token = formObject.values["personalAccessToken"]
+      let tokenStatus = (token && token.length > 0) ? true:false
+      let endpoint = formObject.values["endpoint"]
+      let endpointStatus = (endpoint && endpoint.length > 0) ? true:false
+      let validation = (tokenStatus && endpointStatus) ? true:false
+      return validation
+    }
+
+    formPromise.then(formObject => {
+      let token = formObject.values["personalAccessToken"]
+      let endpoint = formObject.values["endpoint"]
+      credentials.write(serviceTitle, endpoint, token) // Store Endpoint as Username to avoid needing 2 entries
+      let credentialsObj = credentials.read(serviceTitle)
+      fetchData(credentialsObj)
+    })
+  }
+
+  const fetchData = credentialsObj => {
     // START EDIT
     const configs = [{
-        token: "", // use a personal access token
-        jiraUrl: "",
         omnifocusTagToUse: "Jira", // you can also use the format "Parent1 : Parent2 : Child"
         jiraQuery: "assignee=currentuser() and resolution is empty",
         processComments: false, // if true, a subtask is added for each ticket comment
         omnifocusCommentTagToUse: "Jira-Comment",
 //    },
 //    {
-//        token: "",
-//        jiraUrl: "",
 //        omnifocusTagToUse: "",
 //        jiraQuery: "assignee=currentuser() and resolution is empty",
 //        processComments: false,
@@ -31,8 +69,8 @@
     // END EDIT
 
     configs.forEach((config) => {
-        const token = config.token;
-        const jiraUrl = config.jiraUrl;
+        const token = credentialsObj["password"]
+        const jiraUrl = credentialsObj["user"]
         const omnifocusTagToUse = config.omnifocusTagToUse;
         const jiraQuery = config.jiraQuery;
         const processComments = config.processComments;
@@ -203,7 +241,41 @@
         });
     });
 
-  });
+  };
+
+  const action = new PlugIn.Action(function(selection, sender) {
+    try {
+      // If CTRL is pressed during click reset credentials
+      if (app.controlKeyDown) {
+        let credentialsObj = credentials.read(serviceTitle)
+        if(!credentialsObj) {
+          let alertMessage = "There are no stored credentials to remove."
+          new alert("Missing Resource", alertMessage).show()
+        } else {
+          let alertMessage = "Remove the stored credentials?"
+          let alert = new Alert("Confirmation Required", alertMessage)
+          alert.addOption("Reset")
+          alert.addOption("Cancel")
+          alert.show(buttonIndex => {
+            if (buttonIndex === 0) {
+              console.log(`Removing Service "${serviceTitle}"`)
+              credentials.remove(serviceTitle)
+              console.log(`Service "${serviceTitle} removed`)
+            }
+          })
+        }
+      } else { // Else read credentials and run main function or
+        let credentialsObj = credentials.read(serviceTitle)
+        if (credentialsObj) {
+          fetchData(credentialsObj)
+        } else {
+          requestCredentials()
+        }
+      }
+    } catch(err) {
+      console.error(err.name, err.message)
+    }
+  })
 
   action.validate = function (selection, sender) {
     //
