@@ -1,5 +1,10 @@
 # jira-omnifocus
 
+I updated this plugin to fit my needs.
+This includes changing from Basic Auth to Personal Access Tokens to support Jira installations that don't support Basic Auth due to SSO and to save that information in the iCloud Keychain.
+
+
+
 Since I Organize my tasks with OmniFocus, but at the same time I'm forced to use Jira with some Consumers, I was disappointed with the existing Solutions to sync them both.  For this reason, I created this native Plugin which has no extra requirements. Just copy the File to the OmniFocus Plugin Folder,  update user, password and jira_url and you are ready to go.
 
 ## Important
@@ -20,7 +25,7 @@ But you can edit everything else behind this Number. Also, the Note, which is as
 
 ## Limitations for Comment Sync
  * Comments of Tickets, you never had a task for, are not found
- * If you archive to early in OmniFocus, comments will be reopened if the Ticket is still assigned to you. Our you can't sync comments any more, of tickets which are no longer assigned to you.  Reason is, that even the completed tasks is the reference of the plugin to look for comments. 
+ * If you archive to early in OmniFocus, comments will be reopened if the Ticket is still assigned to you. Our you can't sync comments any more, of tickets which are no longer assigned to you.  Reason is, that even the completed tasks is the reference of the plugin to look for comments.
 
 ## Changelog
 ### Version 1.3
