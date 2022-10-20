@@ -30,15 +30,15 @@
     inputForm.addField(tokenField)
     inputForm.addField(endpointField)
 
-    let formPrompt = "Enter personal access token:"
+    let formPrompt = "Enter PAT and Jira Endpoint:"
     let formPromise = inputForm.show(formPrompt, "Continue")
 
     inputForm.validate = formObject => {
       let token = formObject.values["personalAccessToken"]
-      let tokenStatus = (token && token.length > 0) ? true:false
+      let tokenStatus = (token && token.length > 0)
       let endpoint = formObject.values["endpoint"]
-      let endpointStatus = (endpoint && endpoint.length > 0) ? true:false
-      let validation = (tokenStatus && endpointStatus) ? true:false
+      let endpointStatus = (endpoint && endpoint.length > 0)
+      let validation = (tokenStatus && endpointStatus)
       return validation
     }
 
